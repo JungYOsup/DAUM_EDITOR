@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	
+	<!-- db.properties 파일 위치 -->	
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<!-- dbproperties의 경로를 지정 -->
+				<value>classpath:properties/db.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- mybatis를 사용하기위한 세팅 db.properties 정보를 통해 dataSource 생성 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driver}"/>
+		<property name="url" value="${url}"/>
+		<property name="username" value="${username}"/>
+		<property name="password" value="${password}"/>
+		<property name="defaultAutoCommit" value="true"/>
+	</bean>
+	
+	<!-- datasource를 가지고 sqlSession 객체 작성 -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="WEB-INF/spring/sqls/SqlMapConfig.xml"/>
+	</bean>
+	
+	<!-- sqlSessionFactory에서 sqlSessionTemplate으로 바꾸어줌 -->
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSession"/> <!-- constructor-arg는 SqlSessionTemplate의 생성자(생성자를 호출함) -->
+	</bean>
+	
+	<!-- Transaction 처리를 위한 객체선언 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+<!-- 1번방법 @transactional이라고 선언된 메서드를 찾는다. -->
+<!-- 	<tx:annotation-driven transaction-manager="transactionManager" -->
+<!-- 		proxy-target-class="true"/> -->
+
+<!-- 2번방법 aop 관점지향 프로그래밍-->
+	<tx:advice transaction-manager="transactionManager" id="txAdvice">
+		<tx:attributes>
+			<tx:method name="replyBoard" propagation="REQUIRED" rollback-for="Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut expression="execution(* com.hk.answerboard.service.*Service.*Board(..))" id="serviceTransaction"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceTransaction"/>
+	</aop:config>
+		
+</beans>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

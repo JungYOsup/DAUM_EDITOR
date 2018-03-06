@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- MYBATIS에서 쓰는 태그를 사용하기위해 DOCTYPE으로 선언해주어야 한다. -->
+<configuration>
+ 	<typeAliases>
+		<typeAlias type="com.hk.answerboard.dtos.AnswerDto" alias="AnswerDto"/>
+		<typeAlias type="com.hk.answerboard.dtos.FileDto" alias="FileDto"/>
+	</typeAliases>
+	
+	<mappers>
+		<mapper resource="/sqls/ansboard_mapper.xml"/>
+	</mappers>
+</configuration>

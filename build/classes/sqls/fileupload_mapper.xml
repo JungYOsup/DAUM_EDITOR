@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hk.fileupload">
+
+	<insert id="insertFile" parameterType="FileDto">
+		INSERT INTO FILEINFO VALUES(FILEINFO_SEQ.NEXVAL,#{originalName},#{modifyName},#{filesize},SYSDATE,'N')
+	</insert>
+
+<!-- round(file_size/1024,1) 키로바이트 단위로 저장하는 방법-->
+	<select id="listFile" resultType="FileDto">
+		select seq, origin_name, stored_name, file_size, f_regdate, f_delflag from fileinfo order by f_regdate desc 
+	</select>
+
+	<select id="getFile" resultType="FileDto" parameterType="int">
+		select seq, origin_name, stored_name, file_size, f_regdate, f_delflag from fileinfo where seq=#{seq} 
+	</select>
+
+</mapper>
